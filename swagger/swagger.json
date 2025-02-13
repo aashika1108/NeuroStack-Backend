@@ -1,0 +1,244 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Health Management API",
+      "version": "1.0.0",
+      "description": "API documentation for managing disorders, doctors, and patients"
+    },
+    "paths": {
+      "/disorders": {
+        "post": {
+          "summary": "Create a disorder",
+          "operationId": "createDisorder",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Disorder"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Disorder created successfully"
+            }
+          }
+        }
+      },
+      "/doctors/{id}": {
+        "put": {
+          "summary": "Update a doctor's information (only provided fields)",
+          "tags": ["Doctors"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "Doctor ID",
+              "schema": { "type": "integer" }
+            }
+          ],
+          "requestBody": {
+            "required": false,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "first_name": { "type": "string", "example": "Updated John" },
+                    "last_name": { "type": "string", "example": "Updated Doe" },
+                    "email": { "type": "string", "example": "updatedjohn@example.com" },
+                    "contact": { "type": "string", "example": "+1234567891" },
+                    "specialization": { "type": "string", "example": "Updated Cardiology" },
+                    "subscription": { "type": "boolean", "example": true }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Doctor updated successfully",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "Doctor updated successfully"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No fields provided for update",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "error": "No fields provided for update"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Doctor not found",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "error": "Doctor not found"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/doctors": {
+        "post": {
+          "summary": "Create a doctor",
+          "operationId": "createDoctor",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Doctor"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Doctor created successfully"
+            }
+          }
+        }
+      },
+
+      "/patients": {
+        "post": {
+          "summary": "Create a patient",
+          "operationId": "createPatient",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Patient"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Patient created successfully"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Disorder": {
+          "type": "object",
+          "properties": {
+            "disorder_name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "treatment_plan": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "plan_name": {
+                    "type": "string"
+                  },
+                  "medications": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": ["disorder_name", "description", "treatment_plan"]
+        },
+        "Doctor": {
+          "type": "object",
+          "properties": {
+            "first_name": {
+              "type": "string"
+            },
+            "last_name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "contact": {
+              "type": "number"
+            },
+            "specialization": {
+              "type": "string"
+            },
+            "subscription": {
+              "type": "boolean"
+            },
+            "created_At": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": ["first_name", "last_name", "email", "password", "contact", "subscription", "created_At"]
+        },
+        "Patient": {
+          "type": "object",
+          "properties": {
+            "first_name": {
+              "type": "string"
+            },
+            "last_name": {
+              "type": "string"
+            },
+            "dob": {
+              "type": "string",
+              "format": "date"
+            },
+            "gender": {
+              "type": "string",
+              "enum": ["male", "female", "other"]
+            },
+            "email": {
+              "type": "string"
+            },
+            "contact": {
+              "type": "number"
+            },
+            "emergency_contact": {
+              "type": "number"
+            },
+            "address": {
+              "type": "string"
+            },
+            "doctor_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "created_At": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": ["first_name", "last_name", "dob", "email", "contact", "emergency_contact", "doctor_id", "created_At"]
+        }
+      }
+    }
+  }
+  

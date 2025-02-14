@@ -12,25 +12,41 @@ const Disorder = {
 
       const disorderId = result.insertId;
 
-      // Insert into `treatmentPlans` if treatment_plan exists
-      if (treatment_plan && treatment_plan.length > 0) {
-        const treatmentQuery =
-          "INSERT INTO treatmentPlans (disorder_id, plan_name, medications) VALUES ?";
-        const treatmentValues = treatment_plan.map((plan) => [
-          disorderId,
-          plan.plan_name,
-          plan.medications.join(","),
-        ]);
-
-        db.query(treatmentQuery, [treatmentValues], (err) => {
-          if (err) return callback(err);
-          callback(null, {
-            message: "Disorder and treatment plans added successfully",
-          });
+      // If there is no treatment plan, return disorder info only
+      if (!treatment_plan || treatment_plan.length === 0) {
+        return callback(null, {
+          message: "Disorder added successfully",
+          disorder: {
+            disorder_id: disorderId,
+            disorder_name,
+            description,
+            treatment_plan: [],
+          },
         });
-      } else {
-        callback(null, { message: "Disorder added successfully" });
       }
+
+      // Insert into `treatment_plan` if treatment_plan exists
+      const treatmentQuery =
+        "INSERT INTO treatment_plan (disorder_id, plan_name, medications) VALUES ?";
+      const treatmentValues = treatment_plan.map((plan) => [
+        disorderId,
+        plan.plan_name,
+        plan.medications.join(","),
+      ]);
+
+      db.query(treatmentQuery, [treatmentValues], (err) => {
+        if (err) return callback(err);
+
+        callback(null, {
+          message: "Disorder and treatment plans added successfully",
+          disorder: {
+            disorder_id: disorderId,
+            disorder_name,
+            description,
+            treatment_plan: treatment_plan,
+          },
+        });
+      });
     });
   },
 
@@ -41,7 +57,7 @@ const Disorder = {
                    JSON_OBJECT('plan_name', t.plan_name, 'medications', t.medications)
                ) AS treatment_plans
         FROM disorders d
-        LEFT JOIN treatmentPlans t ON d.disorder_id = t.disorder_id
+        LEFT JOIN treatment_plan t ON d.disorder_id = t.disorder_id
         GROUP BY d.disorder_id
     `;
 
@@ -68,7 +84,7 @@ const Disorder = {
                    JSON_OBJECT('plan_name', t.plan_name, 'medications', t.medications)
                ) AS treatment_plans
         FROM disorders d
-        LEFT JOIN treatmentPlans t ON d.disorder_id = t.disorder_id
+        LEFT JOIN treatment_plan t ON d.disorder_id = t.disorder_id
         WHERE d.disorder_id = ?
         GROUP BY d.disorder_id
     `;

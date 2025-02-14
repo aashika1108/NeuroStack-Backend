@@ -1,0 +1,139 @@
+CREATE DATABASE Neurostack;
+USE Neurostack;
+
+CREATE TABLE doctors (
+    doctor_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    contact VARCHAR(20) NOT NULL,
+    specialization VARCHAR(255),
+    subscription BOOLEAN NOT NULL DEFAULT FALSE,
+    created_At DATETIME NOT NULL
+);
+
+
+CREATE TABLE disorders (
+  disorder_id INT AUTO_INCREMENT PRIMARY KEY,
+  disorder_name VARCHAR(255) NOT NULL UNIQUE,
+  description TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE patients (
+    patient_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    dob DATE NOT NULL,
+    gender ENUM('male', 'female', 'other') DEFAULT 'male',
+    email VARCHAR(255) NOT NULL UNIQUE,
+    contact VARCHAR(20) NOT NULL,
+    emergency_contact VARCHAR(20) NOT NULL,
+    address TEXT,
+    doctor_id INT NOT NULL,
+	disorder_id INT NOT NULL,
+    created_At DATETIME NOT NULL,
+    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id) ON DELETE CASCADE,
+	FOREIGN KEY (disorder_id) REFERENCES disorders(disorder_id) ON DELETE CASCADE
+);
+
+CREATE TABLE treatment_plan (
+  treatment_plan_id INT AUTO_INCREMENT PRIMARY KEY,
+  disorder_id INT NOT NULL,
+  plan_name VARCHAR(255) NOT NULL,
+  medications TEXT NOT NULL,
+  FOREIGN KEY (disorder_id) REFERENCES disorders(disorder_id) ON DELETE CASCADE
+);
+
+-- Insert data into doctors table
+INSERT INTO doctors (first_name, last_name, email, password, contact, specialization, subscription, created_At)
+VALUES 
+('John', 'Doe', 'johndoe@example.com', 'password123', '1234567890', 'Cardiology', TRUE, NOW()),
+('Jane', 'Smith', 'janesmith@example.com', 'password456', '9876543210', 'Neurology', FALSE, NOW());
+
+-- Insert data into disorder table
+INSERT INTO disorders (disorder_name, description)
+VALUES 
+('Anxiety Disorder', 'A mental health disorder characterized by feelings of worry, anxiety, or fear.'),
+('Diabetes', 'A chronic condition that affects how the body processes blood sugar.');
+
+-- Insert data into patients table
+INSERT INTO patients (first_name, last_name, dob, gender, email, contact, emergency_contact, address, doctor_id, disorder_id, created_At)
+VALUES 
+('Alice', 'Brown', '1990-05-12', 'female', 'alicebrown@example.com', '1112223333', '4445556666', '123 Maple St, NY', 1, 1, NOW()),
+('Bob', 'Johnson', '1985-08-25', 'male', 'bobjohnson@example.com', '7778889999', '6667778888', '456 Oak St, CA', 2, 2, NOW());
+
+-- Insert data into treatment_plan table
+INSERT INTO treatment_plan (disorder_id, plan_name, medications)
+VALUES 
+(1, 'Cognitive Behavioral Therapy', 'SSRIs, Benzodiazepines'),
+(2, 'Diabetes Management', 'Insulin, Metformin');
+
+
+-- CRUD Operations for `doctors`
+
+-- Create
+INSERT INTO doctors (first_name, last_name, email, password, contact, specialization, subscription, created_At)
+VALUES ('New', 'Doctor', 'newdoc@example.com', 'password789', '5556667777', 'Pediatrics', TRUE, NOW());
+
+-- Read
+SELECT * FROM doctors;
+SELECT * FROM doctors WHERE doctor_id = 1;
+
+-- Update
+UPDATE doctors SET specialization = 'Dermatology' WHERE doctor_id = 1;
+
+-- Delete
+DELETE FROM doctors WHERE doctor_id = 1;
+
+-- CRUD Operations for `disorders`
+
+-- Create
+INSERT INTO disorders (disorder_name, description)
+VALUES ('Depression', 'A mood disorder that causes persistent feelings of sadness and loss of interest.');
+
+-- Read
+SELECT * FROM disorders;
+SELECT * FROM disorders WHERE disorder_id = 1;
+
+-- Update
+UPDATE disorders SET description = 'A chronic mental health disorder causing prolonged sadness.' WHERE disorder_id = 1;
+
+-- Delete
+DELETE FROM disorders WHERE disorder_id = 1;
+
+-- CRUD Operations for `patients`
+
+-- Create
+INSERT INTO patients (first_name, last_name, dob, gender, email, contact, emergency_contact, address, doctor_id, disorder_id, created_At)
+VALUES ('Charlie', 'Davis', '2000-02-15', 'other', 'charliedavis@example.com', '3334445555', '2223334444', '789 Pine St, TX', 1, 2, NOW());
+
+-- Read
+SELECT * FROM patients;
+SELECT * FROM patients WHERE patient_id = 1;
+
+-- Update
+UPDATE patients SET address = '999 Elm St, TX' WHERE patient_id = 1;
+
+-- Delete
+DELETE FROM patients WHERE patient_id = 1;
+
+-- CRUD Operations for `treatment_plan`
+
+-- Create
+INSERT INTO treatment_plan (disorder_id, plan_name, medications)
+VALUES (1, 'New Anxiety Treatment', 'Therapy, Medication X');
+
+-- Read
+SELECT * FROM treatment_plan;
+SELECT * FROM treatment_plan WHERE treatment_plan_id = 1;
+
+-- Update
+UPDATE treatment_plan SET medications = 'Updated Medications' WHERE treatment_plan_id = 1;
+
+-- Delete
+DELETE FROM treatment_plan WHERE treatment_plan_id = 1;
+
+
+
